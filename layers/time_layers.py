@@ -61,7 +61,7 @@ class TimeLSTM:
 
 
 
-    def set_state(self, h, c=None): # used in seq2seq
+    def set_state(self, h, c=None): # used in seq2seq forward and generate
         self.h, self.c = h, c
 
 

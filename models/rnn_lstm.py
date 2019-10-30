@@ -9,16 +9,14 @@ class RnnLSTM(BaseModel):
 		V, D, H = vocab_size, wordvec_size, hidden_size
 		rn = np.random
 
-		# initialize weights and biases
 		# np.sqrt(D) is Xavier initialization
 		embed_W  = (rn(V, D) / 100).astype('f')
-		lstm_Wx  = (rn(D, 4 * H) / np.sqrt(D)).astype('f')
-		lstm_Wh  = (rn(H, 4 * H) / np.sqrt(H)).astype('f')
-		lstm_b   = np.zeros(4 * H).astype('f')
+		lstm_Wx  = (rn(D, 4 * H) / np.sqrt(D)).astype('f') # all weights for LSTM
+		lstm_Wh  = (rn(H, 4 * H) / np.sqrt(H)).astype('f') # all weights for LSTM
+		lstm_b   = np.zeros(4 * H).astype('f')             # all weights for LSTM
 		affine_W = (rn(H, V) / np.sqrt(H)).astype('f')
 		affine_b = np.zeros(V).astype('f')
 
-		# setup layers
 		self.layers = [
 			TimeEmbedding(embed_W),
 			TimeLSTM(lstm_Wx, lstm_Wh, lstm_b, stateful=True),
