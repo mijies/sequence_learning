@@ -34,6 +34,30 @@ class Seq2seq(BaseModel):
         hs = self.encoder.forward(xs)
         samples = self.decoder.generate(hs, start_id, sample_size)
         return samples
+    
+
+    def evaluate(self, inputs, correct, id_to_char, verbose=False, is_reverse=False)
+        correct  = correct.flatten()
+        start_id = correct[0] # separator
+        correct  = correct[1:]
+
+        samples = self.generate(inputs, start_id, len(correct))
+
+        # vec2words
+        inputs  = ''.join([id_to_char[int(char)] for char in inputs.flatten()])
+        correct = ''.join([id_to_char[int(char)] for char in correct])
+        samples = ''.join([id_to_char[int(char)] for char in samples])
+
+        if verbose:
+            if is_reverse:
+                inputs = inputs[::-1]
+            
+            print('Input :', inputs)
+            print('Output:', samples)
+            print('Answer:', correct)
+            print('-'*10)
+
+        return 1 if samples == correct else 0
 
 
 # DONE
