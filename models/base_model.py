@@ -1,21 +1,23 @@
+from abc import ABCMeta, abstractmethod
 import os
 import pickle
 import sys
 
 sys.path.append('..')
-from common.np import *
-from common.util import to_cpu, to_gpu
+from common.util import GPU, np, to_cpu, to_gpu
 
 
-class BaseModel:
+class BaseModel(metaclass=ABCMeta):
 	def __init__(self):
 		self.params, self.grad = None, None
 
 
+	@abstractmethod
 	def forward(self, *args):
 		raise NotImplementedError
 
 
+	@abstractmethod
 	def backward(self, *args):
 		raise NotImplementedError
 
@@ -40,7 +42,7 @@ class BaseModel:
 		if '/' in file_name:
 			file_name = file_name.replace('/', os.sep)
 
-		if os.path.exists(file_name):
+		if not os.path.exists(file_name):
 			raise IOError(file_name + ': No such file')
 
 		with open(file_name, 'rb') as f:
@@ -51,5 +53,4 @@ class BaseModel:
 		if GPU:
 			params = [to_gpu(p) for p in params]
 
-		for i, param in enumerate(self.params):
-			param[...] = params[i]
+		self.params = params

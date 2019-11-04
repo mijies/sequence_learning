@@ -15,7 +15,7 @@ class Trainer:
         self.eval_interval = None
 
 
-    def fit(self, x, t, max_epoch, batch_size, max_grad=None, eval_interval):
+    def fit(self, x, t, max_epoch, batch_size, max_grad, eval_interval):
         data_size = len(x)
         max_iter = data_size // batch_size
         self.eval_interval = eval_interval
@@ -73,7 +73,10 @@ class Trainer:
 
 # params can share the objects. So sums up the gradients for computational efficiency
 def concat_duplicate(params, grads):
-    params, grads = params[:], grads[:] # deep copy
+
+
+    # not needed
+    params, grads = params[:], grads[:] # only the list ptrs are different, the elements are shared
 
     while True:
         found = False
@@ -116,5 +119,4 @@ def clip_grads(grads, max_norm):
 
     rate = max_norm / (norm + 1e-7)
     if rate < 1:
-        for grad in grads:
-            grad *= rate
+        grads *= rate

@@ -1,15 +1,17 @@
 from common.util import np
 
 class Embedding:
-    def __init__(self, W):
+	def __init__(self, W):
 		self.params = [W]
 		self.grads  = [np.zeros_like(W)]
 		self.idx    = None
 
+
 	def forward(self, idx):
 		W, = self.params
 		self.idx = idx
-		return W[idx]
+		return W[idx] # takes out only the weights for the input words
+		
 		
 	def backward(self, dout):
 		dW, = self.grads

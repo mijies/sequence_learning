@@ -1,7 +1,7 @@
 import sys
 sys.path.append('..')
-from common.base_model import BaseModel
 from common.time_layers import *
+from models.base_model import BaseModel
 
 # DONE
 class RnnLSTM(BaseModel):
