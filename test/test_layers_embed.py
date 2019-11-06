@@ -1,5 +1,4 @@
 import unittest
-import os
 import sys
 sys.path.append('..')
 from layers.embed import np, Embedding

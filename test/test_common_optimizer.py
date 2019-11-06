@@ -1,36 +1,35 @@
 import unittest
-import numpy as np
 import sys
 sys.path.append('..')
-from common.optimizer import Adam
+from common.optimizer import np, Adam
 
 class TestCommonOptimizer(unittest.TestCase):
     """test class for common/optimizer.py
     """
 
-    # def test_update_fixed_grads(self):
+    def test_update_fixed_grads(self):
 
-    #     optimizer = Adam()
-    #     self.params, params = np.array([[1.,-1.]]), np.array([[1.,-1.]])
-    #     grads = np.array([[1.,1.]]) # grads fixed
+        optimizer = Adam()
+        self.params, params = np.array([[1.,-1.]]), np.array([[1.,-1.]])
+        grads = np.array([[1.,1.]]) # grads fixed
 
-    #     for _ in range(5):
-    #         optimizer.update(params, grads)
-    #         self.assertTrue(all(self.params[0] > params[0])) # simply reduced
-    #         self.params[...] = params
+        for _ in range(5):
+            optimizer.update(params, grads)
+            self.assertTrue(all(self.params[0] > params[0])) # simply reduced
+            self.params[...] = params
 
 
-    # def test_update_descending_grads(self):
+    def test_update_descending_grads(self):
 
-    #     optimizer = Adam()
-    #     self.params, params = np.array([[1.,-1.]]), np.array([[1.,-1.]])
-    #     grads = np.array([[1.,1.]])
+        optimizer = Adam()
+        self.params, params = np.array([[1.,-1.]]), np.array([[1.,-1.]])
+        grads = np.array([[1.,1.]])
 
-    #     for _ in range(5):
-    #         grads *= 0.9 # grads descend
-    #         optimizer.update(params, grads)
-    #         self.assertTrue(all(self.params[0] > params[0])) # simply reduced
-    #         self.params[...] = params
+        for _ in range(5):
+            grads *= 0.9 # grads descend
+            optimizer.update(params, grads)
+            self.assertTrue(all(self.params[0] > params[0])) # simply reduced
+            self.params[...] = params
 
 
     def test_update_exponential_decay(self):
