@@ -1,24 +1,26 @@
-import sys
-sys.path.append('..')
-from common.time_layers import *
-from models.base_model import BaseModel
+from models.base_model import np, BaseModel
+from layers.time_embed import TimeEmbedding
+from layers.time_lstm  import TimeLSTM
+from layers.time_affine import TimeAffine
+from layers.time_softmax_with_loss import TimeSoftmaxWithLoss
 
 # DONE
 class Seq2seq(BaseModel):
     def __init__(self, vocab_size, wordvec_size, hidden_size):
         V, D, H = vocab_size, wordvec_size, hidden_size
+
         self.encoder = Encoder(V, D, H)
-        self.decoder = Dncoder(V, D, H)
+        self.decoder = Decoder(V, D, H)
         self.softmax = TimeSoftmaxWithLoss()
 
         self.params = self.encoder.params + self.decoder.params
-        self.grads = self.encoder.grads + self.decoder.grads
+        self.grads  = self.encoder.grads  + self.decoder.grads
 
 
-    def forward(self, xs):
-        docoder_xs, decoder_ts = xs[:, :-1], xs[:, 1:]
+    def forward(self, xs, ts):
+        docoder_xs, decoder_ts = ts[:, :-1], ts[:, 1:]
         hs   = self.encoder.forward(xs)
-        xs   = self.decoder.forward(xs, hs)
+        xs   = self.decoder.forward(docoder_xs, hs)
         loss = self.softmax.forward(xs, decoder_ts)
         return loss
     
@@ -36,13 +38,13 @@ class Seq2seq(BaseModel):
         return samples
     
 
-    def evaluate(self, inputs, correct, id_to_char, verbose=False, is_reverse=False)
+    def evaluate(self, inputs, correct, id_to_char, verbose=False, is_reverse=False):
         correct  = correct.flatten()
         start_id = correct[0] # separator
         correct  = correct[1:]
 
         samples = self.generate(inputs, start_id, len(correct))
-
+        
         # vec2words
         inputs  = ''.join([id_to_char[int(char)] for char in inputs.flatten()])
         correct = ''.join([id_to_char[int(char)] for char in correct])
@@ -54,7 +56,11 @@ class Seq2seq(BaseModel):
             
             print('Input :', inputs)
             print('Output:', samples)
-            print('Answer:', correct)
+            if samples == correct:
+                answer = '\033[92mAnswer:\033[0m'
+            else:
+                answer = '\033[91mAnswer:\033[0m'
+            print(answer, correct)
             print('-'*10)
 
         return 1 if samples == correct else 0
@@ -62,14 +68,16 @@ class Seq2seq(BaseModel):
 
 # DONE
 class Encoder():
-    def __init__(self, , vocab_size, wordvec_size, hidden_size):
+    def __init__(self, vocab_size, wordvec_size, hidden_size):
         V, D, H = vocab_size, wordvec_size, hidden_size
         rn = np.random.randn
 
+        # used as np.dot(x, Wx) + np.dot(h_prev, Wh) + b
+        # np.sqrt(D) is Xavier initialization
         embed_W = (rn(V, D) / 100).astype('f')
         lstm_Wx = (rn(D, 4 * H) / np.sqrt(D)).astype('f') # all weights for LSTM
-        lstm_Wh = (rn(D, 4 * H) / np.sqrt(H)).astype('f') # all weights for LSTM
-        lstm_b  = np.zeros(4 * H).astype('f')              # all weights for LSTM
+        lstm_Wh = (rn(H, 4 * H) / np.sqrt(H)).astype('f') # all weights for LSTM
+        lstm_b  = np.zeros(4 * H).astype('f')             # zeros is okay as backward adds up
 
         self.embed = TimeEmbedding(embed_W)
         self.lstm  = TimeLSTM(lstm_Wx, lstm_Wh, lstm_b, stateful=False)
@@ -101,15 +109,17 @@ class Decoder():
         V, D, H = vocab_size, wordvec_size, hidden_size
         rn = np.random.randn
 
+        # used as np.dot(x, Wx) + np.dot(h_prev, Wh) + b
 		# np.sqrt(D) is Xavier initialization
         embed_W  = (rn(V, D) / 100).astype('f')
         lstm_Wx  = (rn(D, 4 * H) / np.sqrt(D)).astype('f')
-        lstm_Wh  = (rn(D, 4 * H) / np.sqrt(H)).astype('f')
+        lstm_Wh  = (rn(H, 4 * H) / np.sqrt(H)).astype('f')
         lstm_b   = np.zeros(4 * H).astype('f')
+
         affine_W = (rn(H, V) / np.sqrt(H)).astype('f')
         affine_b = np.zeros(V).astype('f')
 
-		self.layers = [
+        self.layers = [
 			TimeEmbedding(embed_W),
 			TimeLSTM(lstm_Wx, lstm_Wh, lstm_b, stateful=True),
 			TimeAffine(affine_W, affine_b)
@@ -124,7 +134,7 @@ class Decoder():
 
     
     def forward(self, xs, h):
-        self.set_state(h)
+        self.lstm_layer.set_state(h)
         for layer in self.layers:
             xs = layer.forward(xs)
         return xs
@@ -136,10 +146,10 @@ class Decoder():
         return self.lstm_layer.dh
 
 
-    def generate(self, h, start_id, sample_size):
+    def generate(self, hs, start_id, sample_size):
         samples = []
         sample_id = start_id
-        self.lstm_layer.set_state(h)
+        self.lstm_layer.set_state(hs)
 
         for _ in range(sample_size):
             xs = np.array(sample_id).reshape((1, 1))
@@ -147,6 +157,6 @@ class Decoder():
                 xs = layer.forward(xs)
             
             sample_id = np.argmax(xs.flatten())
-            samples.append(sample_id)
+            samples.append(int(sample_id))
         
         return samples

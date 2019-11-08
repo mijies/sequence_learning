@@ -5,7 +5,7 @@ import sys
 sys.path.append('..')
 from models.base_model import BaseModel
 
-class TestCommonBaseModel(unittest.TestCase):
+class TestModelsBaseModel(unittest.TestCase):
     """test class for common/base_model.py
     """
     def setUp(self):

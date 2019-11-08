@@ -1,9 +1,6 @@
 from abc import ABCMeta, abstractmethod
 import os
 import pickle
-import sys
-
-sys.path.append('..')
 from common.util import GPU, np, to_cpu, to_gpu
 
 

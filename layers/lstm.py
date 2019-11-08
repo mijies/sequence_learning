@@ -1,5 +1,4 @@
-from common.util import np
-from common.functions import sigmoid
+from common.functions import np, sigmoid
 
 # DONE
 class LSTM:
@@ -35,14 +34,14 @@ class LSTM:
         return h_next, c_next
     
 
-    def backward(self, dh, dh_next, dc_next):
+    def backward(self, dh_next, dc_next):
         Wx, Wh, b = self.params
         x, h_prev, c_prev, i, f, tv, o, c_next = self.cache
 
         # h_next = o * np.tanh(c_next)
-        tc_next = np.tanh(c_next)
-        dc_next2 = (dh_next * o) * (1 - tc_next ** 2) # tanh'
+        tc_next  = np.tanh(c_next)
         do = dh_next * tc_next
+        dc_next2 = (dh_next * o) * (1 - tc_next ** 2) # tanh' => 1 - y**2
 
         # c_next = f * c_prev + tv * i
         dc_next += dc_next2 # combine the split c_next computational graph
@@ -57,15 +56,15 @@ class LSTM:
 
         dALL = np.hstack((df, dtv, di, do)) # horizontally concatnate
 
-        dWx = np.dot(h_prev.T, dALL)
-        dWh = np.dot(x.T, dALL)
-        db  = sAll.sum(axis=0)
+        dWx = np.dot(x.T, dALL)
+        dWh = np.dot(h_prev.T, dALL)
+        db  = dALL.sum(axis=0)
 
         self.grads[0][...] = dWx
         self.grads[1][...] = dWh
         self.grads[2][...] = db
         
-        dx = np.dot(dAll, Wx.T)
-        dh_prev = np.dot(dAll, Wh.T)
+        dx = np.dot(dALL, Wx.T)
+        dh_prev = np.dot(dALL, Wh.T)
 
         return dx, dh_prev, dc_prev

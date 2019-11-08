@@ -1,9 +1,6 @@
-import sys
-sys.path.append('..')
-# import numpy
 import time
 import matplotlib.pyplot as plt
-
+# import numpy
 from common.util import np
 
 # DONE
@@ -13,6 +10,7 @@ class Trainer:
         self.optimizer = optimizer
         self.loss_list = []
         self.eval_interval = None
+        self.current_epoch = 0
 
 
     def fit(self, x, t, max_epoch, batch_size, max_grad, eval_interval):
@@ -50,14 +48,16 @@ class Trainer:
                 optimizer.update(params, grads)
             
                 # evaluation
-                if (eval_interval is not None) and (iter // eval_interval) == 0:
+                if (eval_interval is not None) and (iter % eval_interval) == 0:
                     elapsed_time = time.time() - start_time
                     avg_loss = total_loss / loss_count
 
                     print('| epoch %d |  iter %d / %d | time %d[s] | loss %.2f'
-                          % (epoch + 1, iter + 1, max_iter, elapsed_time, avg_loss))
+                          % (self.current_epoch + 1, iter + 1, max_iter, elapsed_time, avg_loss))
                     self.loss_list.append(float(avg_loss))
                     total_loss, loss_count = 0, 0
+
+            self.current_epoch += 1
     
 
     def plot(self, ylim=None): # ylim : (int, int)
@@ -73,18 +73,12 @@ class Trainer:
 
 # params can share the objects. So sums up the gradients for computational efficiency
 def concat_duplicate(params, grads):
-
-
-    # not needed
-    params, grads = params[:], grads[:] # only the list ptrs are different, the elements are shared
-
     while True:
         found = False
         param_size = len(params)
 
-        for i in range(0, param_size -1):
-            for j in range(1, param_size):
-
+        for i in range(0, param_size - 1):
+            for j in range(i + 1, param_size):
                 if params[i] is params[j]: # if identical
                     found = True
                     grads[i] += grads[j] # add up gradients
@@ -96,15 +90,13 @@ def concat_duplicate(params, grads):
                      params[i].T.shape == params[j].shape and \
                      np.all(params[i].T == params[j]):
                     found = True
-                    grads[i] += grads[j] # add up gradients
+                    grads[i] += grads[j].T # add up gradients
                     params.pop(j)
                     grads.pop(j)
                 
                 if found:break
             if found:break
-
         if not found: break
-    
     return params, grads
 
 
@@ -119,4 +111,7 @@ def clip_grads(grads, max_norm):
 
     rate = max_norm / (norm + 1e-7)
     if rate < 1:
-        grads *= rate
+        for grad in grads: # must take out grad as grads is just a list type
+            grad *= rate
+
+

@@ -2,14 +2,15 @@ import sys
 sys.path.append('..')
 import numpy as np
 import matplotlib.pyplot as plt
+plt.switch_backend('agg') # Set display backend
 
 from common.optimizer import Adam
 from common.trainer import Trainer
 from data import sequence
-from seq2seq import Seq2seq
+from models.seq2seq import Seq2seq
 
 # data loading
-(x_train, t_train), (x_test, t_test) = sequence.load_data('date.txt')
+(x_train, t_train), (x_test, t_test) = sequence.load_data('addition.txt')
 char_to_id, id_to_char = sequence.get_vocab()
 
 # inverse data
@@ -20,9 +21,10 @@ if is_reverse:
 # hyper parameters
 vocab_size   = len(char_to_id)
 wordvec_size = 16
-hidden_size  = 256
+hidden_size  = 128
 batch_size   = 128
-max_epoch    = 10
+epochs       = 25
+max_epoch    = 1
 max_grad     = 5.0
 eval_interval = 20
 
@@ -32,9 +34,9 @@ optimizer = Adam()
 trainer = Trainer(model, optimizer)
 
 acc_list = []
-for epoch in range(max_epoch):
+for epoch in range(epochs):
 
-    trainer.fit(x_train, t_train, max_epoch=1, batch_size, max_grad, eval_interval)
+    trainer.fit(x_train, t_train, max_epoch, batch_size, max_grad, eval_interval)
 
     # validation test
     correct_count = 0
@@ -51,9 +53,9 @@ for epoch in range(max_epoch):
 model.save_params()
 
 # visualization
-x = np.arange(len(acc_list))
-plt.plot(x, acc_list, marker='o')
-plt.xlabel('epochs')
-plt.ylabel('accuracy')
-plt.ylim(-0.05, 1.05)
-plt.show()
+# x = np.arange(len(acc_list))
+# plt.plot(x, acc_list, marker='o')
+# plt.xlabel('epochs')
+# plt.ylabel('accuracy')
+# plt.ylim(-0.05, 1.05)
+# plt.show()

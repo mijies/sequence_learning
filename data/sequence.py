@@ -3,8 +3,8 @@ sys.path.append('..')
 import os
 import numpy
 
-id_to_char = []
-char_to_id = []
+id_to_char = {}
+char_to_id = {}
 
 def get_vocab():
 	return char_to_id, id_to_char 
@@ -36,12 +36,12 @@ def load_data(file_name, seed=1234):
         _update_vocab(j)
         _update_vocab(k)
     
-    x = np.array((len(inputs), len(inputs[0])), dtype=np.int)
-    t = np.array((len(outputs), len(outputs[0])), dtype=np.int)
+    x = numpy.zeros((len(inputs), len(inputs[0])), dtype=numpy.int)
+    t = numpy.zeros((len(outputs), len(outputs[0])), dtype=numpy.int)
 
     for i in range(len(inputs)):
         x[i] = [char_to_id[char] for char in list(inputs[i])]
-        y[i] = [char_to_id[char] for char in list(outputs[i])]
+        t[i] = [char_to_id[char] for char in list(outputs[i])]
     
     # shuffle
     indices = numpy.arange(len(x))

@@ -1,4 +1,3 @@
-import sys
 from common.config import GPU
 
 if GPU:
@@ -8,9 +7,10 @@ if GPU:
     # Performs unbuffered in place operation on operand a for elements specified by indices.
 	np.add.at = np.scatter_add  
 
-	print("  GPU mode(cupy)")
+	print("  Cupy mode")
 
 else:
+	print("  Non-cupy mode")
 	import numpy as np
 
 

@@ -8,8 +8,21 @@ class TestCommonTrainer(unittest.TestCase):
     """test class for common/trainer.py
     """
 
+    def test_fit(self):
+        # TODO
+        print()
+
+
     def test_concat_duplicate(self):
-        self.params = np.
+
+        shared = np.zeros(2)
+        params = np.ones(8).reshape(4,2)
+        # TODO
+        # params[1] = shared
+        # params[3] = shared
+        # print(params[1] is params[3])
+
+
 
     def test_clip_grads(self):
         max_norm = 2.
