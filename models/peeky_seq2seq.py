@@ -60,6 +60,7 @@ class PeekyDecoder(): # put encoder hs into all xs time sequences for LSTM and A
         score = self.affine.forward(out)
         return score
 
+
     
     def backward(self, dscore):
         H = self.cache
@@ -75,12 +76,13 @@ class PeekyDecoder(): # put encoder hs into all xs time sequences for LSTM and A
         return self.lstm.dh + np.sum(dhs, axis=1) # (np.repeat(h, T, axis=0))'
 
 
+
     def generate(self, hs, start_id, sample_size):
         samples = []
         sample_id = start_id
         self.lstm.set_state(hs)
 
-        H  = hs[1] # (N, H)
+        H  = hs.shape[1] # (N, H)
         hs = hs.reshape(1, 1, H) # T is 1 as used in time loop
         for _ in range(sample_size):
             xs  = np.array(sample_id).reshape((1, 1))

@@ -19,7 +19,7 @@ class TimeSoftmaxWithLoss:
         ys = softmax(xs)   
         ls = np.log(ys[np.arange(N * T), ts]) # takes out only the indices by ts
 
-        mask = (ts != self.mask_label) # paddings "-1" get False
+        mask = np.array(ts != self.mask_label) # paddings "-1" get False
         ls *= mask
         loss = -np.sum(ls) / mask.sum() # divided by the number of non-padding words
 

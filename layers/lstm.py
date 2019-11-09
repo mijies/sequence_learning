@@ -45,7 +45,11 @@ class LSTM:
         # c_next = f * c_prev + tv * i
         dc_next += dc_next2 # combine the split c_next computational graph
         dc_prev  = dc_next * f
-        df, dtv, di = [c_prev, i, tv] * dc_next
+        # df, dtv, di = [c_prev, i, tv] * dc_next
+        #    => this syntax doesn't work with cupy
+        df  = c_prev * dc_next
+        dtv = i  * dc_next
+        di  = tv * dc_next
 
         # activation functions
         df  *= f * (1 - f)
