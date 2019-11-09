@@ -4,7 +4,6 @@ from layers.time_lstm  import TimeLSTM
 from layers.time_affine import TimeAffine
 from layers.time_softmax_with_loss import TimeSoftmaxWithLoss
 
-# DONE
 class Seq2seq(BaseModel):
     def __init__(self, vocab_size, wordvec_size, hidden_size):
         V, D, H = vocab_size, wordvec_size, hidden_size
@@ -66,7 +65,7 @@ class Seq2seq(BaseModel):
         return 1 if samples == correct else 0
 
 
-# DONE
+
 class Encoder():
     def __init__(self, vocab_size, wordvec_size, hidden_size):
         V, D, H = vocab_size, wordvec_size, hidden_size
@@ -103,7 +102,7 @@ class Encoder():
         return None # TimeEmbedding.backward() returns None
 
 
-# DONE
+
 class Decoder():
     def __init__(self, vocab_size, wordvec_size, hidden_size):
         V, D, H = vocab_size, wordvec_size, hidden_size
@@ -124,7 +123,7 @@ class Decoder():
 			TimeLSTM(lstm_Wx, lstm_Wh, lstm_b, stateful=True),
 			TimeAffine(affine_W, affine_b)
 		]
-        self.lstm_layer = self.layers[1] # used in backward()
+        self.lstm = self.layers[1] # used in backward()
 
 		# pack all the params and grads in
         self.params, self.grads = [], []
@@ -134,7 +133,7 @@ class Decoder():
 
     
     def forward(self, xs, h):
-        self.lstm_layer.set_state(h)
+        self.lstm.set_state(h)
         for layer in self.layers:
             xs = layer.forward(xs)
         return xs
@@ -143,13 +142,13 @@ class Decoder():
     def backward(self, dx):
         for layer in reversed(self.layers):
             dx = layer.backward(dx) # TimeEmbedding.backward() returns None
-        return self.lstm_layer.dh
+        return self.lstm.dh
 
 
     def generate(self, hs, start_id, sample_size):
         samples = []
         sample_id = start_id
-        self.lstm_layer.set_state(hs)
+        self.lstm.set_state(hs)
 
         for _ in range(sample_size):
             xs = np.array(sample_id).reshape((1, 1))

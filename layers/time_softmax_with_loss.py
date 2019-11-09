@@ -1,6 +1,6 @@
 from common.functions import np, softmax
 
-# DONE
+
 class TimeSoftmaxWithLoss:
     def __init__(self):
         self.params, self.grads = [], []

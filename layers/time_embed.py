@@ -1,6 +1,5 @@
 from layers.embed import np, Embedding
 
-# DONE
 class TimeEmbedding:
     def __init__(self, W):
         self.params = [W] # into a list because concatenated in Encoder and Decoder

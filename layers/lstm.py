@@ -1,6 +1,5 @@
 from common.functions import np, sigmoid
 
-# DONE
 class LSTM:
     def __init__(self, Wx, Wh, b):
         # pack in the weights and biases for the following 4
@@ -15,7 +14,7 @@ class LSTM:
         Wx, Wh, b = self.params
         N, H      = h_prev.shape
 
-        ALL = np.dot(x, Wx) + np.dot(h_prev, Wh) + b
+        ALL = np.dot(x, Wx) + np.dot(h_prev, Wh) + b # if peeky, x.shape (N, H + D)
 
         f  = ALL[:, :H]
         tv = ALL[:H, H:H*2] # used with input gate to update cell

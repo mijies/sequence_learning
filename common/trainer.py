@@ -1,9 +1,8 @@
 import time
 import matplotlib.pyplot as plt
-# import numpy
+import numpy
 from common.util import np
 
-# DONE
 class Trainer:
     def __init__(self, model, optimizer):
         self.model     = model
@@ -25,7 +24,7 @@ class Trainer:
         start_time = time.time()
         for epoch in range(max_epoch):
             # shuffle
-            idx = np.random.permutation(np.arange(data_size))
+            idx = numpy.random.permutation(np.arange(data_size))
             x = x[idx]
             t = t[idx]
 

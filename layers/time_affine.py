@@ -1,6 +1,5 @@
 from common.util import np
 
-# DONE
 class TimeAffine:
     def __init__(self, W, b):
         self.params = [W, b]
@@ -10,7 +9,7 @@ class TimeAffine:
     
     def forward(self, xs):
         W, b = self.params
-        N, T, D = xs.shape
+        N, T, D = xs.shape # if peeky, D.shape is (H + H)
         self.xs = xs
 
         rxs = xs.reshape(N * T, -1) # -1 denotes the rest of the dimensions

@@ -8,13 +8,14 @@ from common.optimizer import Adam
 from common.trainer import Trainer
 from data import sequence
 from models.seq2seq import Seq2seq
+from models.peeky_seq2seq import PeekySeq2seq
 
 # data loading
 (x_train, t_train), (x_test, t_test) = sequence.load_data('addition.txt')
 char_to_id, id_to_char = sequence.get_vocab()
 
 # inverse data
-is_reverse = False
+is_reverse = True
 if is_reverse:
     x_train, x_test = x_train[:, ::-1], x_test[:, ::-1]
 
@@ -28,7 +29,8 @@ max_epoch    = 1
 max_grad     = 5.0
 eval_interval = 20
 
-model = Seq2seq(vocab_size, wordvec_size, hidden_size)
+# model = Seq2seq(vocab_size, wordvec_size, hidden_size)
+model = PeekySeq2seq(vocab_size, wordvec_size, hidden_size)
 optimizer = Adam()
 
 trainer = Trainer(model, optimizer)
@@ -53,9 +55,9 @@ for epoch in range(epochs):
 model.save_params()
 
 # visualization
-# x = np.arange(len(acc_list))
-# plt.plot(x, acc_list, marker='o')
-# plt.xlabel('epochs')
-# plt.ylabel('accuracy')
-# plt.ylim(-0.05, 1.05)
-# plt.show()
+x = np.arange(len(acc_list))
+plt.plot(x, acc_list, marker='o')
+plt.xlabel('epochs')
+plt.ylabel('accuracy')
+plt.ylim(-0.05, 1.05)
+plt.show()

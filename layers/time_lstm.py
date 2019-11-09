@@ -1,6 +1,5 @@
 from layers.lstm import np, LSTM
 
-# DONE
 class TimeLSTM:
     def __init__(self, Wx, Wh, b, stateful=False):
         self.params = [Wx, Wh, b]
@@ -14,7 +13,7 @@ class TimeLSTM:
     
     def forward(self, xs):
         Wx, Wh, b = self.params
-        N, T, D   = xs.shape
+        N, T, D   = xs.shape # if peeky, D is (H + D)
         H = Wh.shape[0]
 
         hs = np.empty((N, T, H),dtype='f')

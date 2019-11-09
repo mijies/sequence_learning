@@ -1,6 +1,5 @@
 from common.util import np
 
-# DONE
 class Adam():
     def __init__(self, lr=0.001, beta1=0.9, beta2=0.999):
         self.lr = lr
